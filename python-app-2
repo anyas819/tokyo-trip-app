@@ -1,0 +1,423 @@
+import React, { useState, useEffect } from 'react';
+import { Plane, Train, MapPin, Coffee, Camera, Utensils, Moon, Sun, Star, Heart, Clock, ArrowRight, Sparkles } from 'lucide-react';
+
+const ScheduleCard = ({ day, date, title, events, mood, moodColor }) => {
+  const [isOpen, setIsOpen] = useState(true);
+
+  return (
+    <div className="mb-8 bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg overflow-hidden border border-stone-200 transform transition-all hover:scale-[1.01] duration-300">
+      <div 
+        className={`p-4 sm:p-6 cursor-pointer flex justify-between items-center ${moodColor} text-white`}
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <div>
+          <h2 className="text-2xl font-bold tracking-wider font-serif">DAY {day}</h2>
+          <div className="flex items-center gap-2 opacity-90 text-sm sm:text-base">
+            <span className="font-medium">{date}</span>
+            <span>•</span>
+            <span className="font-medium">{title}</span>
+          </div>
+        </div>
+        <div className="bg-white/20 p-2 rounded-full">
+          {isOpen ? <Sparkles size={20} /> : <ArrowRight size={20} />}
+        </div>
+      </div>
+
+      <div className={`transition-all duration-500 ease-in-out ${isOpen ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'}`}>
+        <div className="p-4 sm:p-6 bg-stone-50">
+           {/* Mood Tag */}
+          <div className="mb-6 flex items-center gap-2 text-stone-500 text-sm italic border-l-4 border-stone-300 pl-3">
+             <Heart size={14} className="text-red-400" />
+             <span>{mood}</span>
+          </div>
+
+          <div className="space-y-6 relative">
+            {/* Vertical Line */}
+            <div className="absolute left-[19px] top-2 bottom-4 w-0.5 bg-stone-200"></div>
+
+            {events.map((event, index) => (
+              <div key={index} className="relative pl-12 sm:pl-16 group">
+                {/* Time Bubble */}
+                <div className="absolute left-0 top-0 w-10 h-10 rounded-full bg-white border-2 border-stone-200 flex items-center justify-center z-10 shadow-sm group-hover:border-blue-300 transition-colors">
+                  {event.icon}
+                </div>
+
+                {/* Content */}
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-6 items-start">
+                  <div className="flex-1">
+                    <span className="inline-block px-2 py-0.5 rounded-md bg-stone-200 text-stone-600 text-xs font-bold mb-1">
+                      {event.time}
+                    </span>
+                    <h3 className="text-lg font-bold text-stone-800 mb-1">{event.activity}</h3>
+                    <p className="text-stone-600 text-sm leading-relaxed mb-2">{event.desc}</p>
+                    
+                    {event.tags && (
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {event.tags.map((tag, tIdx) => (
+                          <span key={tIdx} className="text-[10px] uppercase tracking-wider text-stone-400 border border-stone-200 px-2 py-0.5 rounded-full bg-white">
+                            #{tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Image Placeholder (Polaroid Style) */}
+                  {event.imageUrl && (
+                    <div className="w-full sm:w-48 bg-white p-2 shadow-md rotate-1 hover:rotate-0 transition-transform duration-300 flex-shrink-0">
+                      <div className="aspect-video w-full bg-stone-200 relative overflow-hidden group-image">
+                        <img 
+                          src={event.imageUrl} 
+                          alt={event.activity}
+                          className="w-full h-full object-cover grayscale-[10%] group-hover:grayscale-0 transition-all duration-500"
+                        />
+                      </div>
+                      <div className="mt-2 text-center text-xs font-handwriting text-stone-500 truncate">
+                        {event.activity}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const ItineraryApp = () => {
+  const [daysLeft, setDaysLeft] = useState(0);
+
+  useEffect(() => {
+    const targetDate = new Date('2025-12-19T00:00:00');
+    const today = new Date();
+    const diffTime = targetDate - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    setDaysLeft(diffDays > 0 ? diffDays : 0);
+  }, []);
+
+  const scheduleData = [
+    {
+      day: 1,
+      date: "12/19 (五)",
+      title: "抵達與聖誕燈飾",
+      mood: "期待已久的旅行終於開始，東京的空氣是冰冷而興奮的。",
+      moodColor: "bg-indigo-900",
+      events: [
+        {
+          time: "16:50",
+          activity: "抵達成田機場 (NRT)",
+          desc: "降落東京，深吸一口日本的空氣！辦理入境手續。",
+          icon: <Plane size={18} className="text-indigo-600" />,
+          tags: ["入境", "成田機場"],
+          imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Narita_International_Airport_Terminal_1_South_Wing_Departure_Lobby.jpg/800px-Narita_International_Airport_Terminal_1_South_Wing_Departure_Lobby.jpg"
+        },
+        {
+          time: "19:30",
+          activity: "抵達東京市區 & Check-in",
+          desc: "搭乘 Skyliner 或 N'EX 前往市區，先到飯店卸下行李。",
+          icon: <MapPin size={18} className="text-orange-500" />,
+          tags: ["飯店", "Check-in"]
+        },
+        {
+          time: "20:00",
+          activity: "東京駅一番街晚餐",
+          desc: "拉麵街或美食街覓食，感受東京車站的繁忙與聖誕燈飾的輝煌。",
+          icon: <Utensils size={18} className="text-red-500" />,
+          tags: ["拉麵", "東京車站"],
+          imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/Tokyo_Station_Marunouchi_Building_at_night_2017.jpg/800px-Tokyo_Station_Marunouchi_Building_at_night_2017.jpg"
+        }
+      ]
+    },
+    {
+      day: 2,
+      date: "12/20 (六)",
+      title: "下町與新文化",
+      mood: "穿梭在新舊之間，從雷門的紅燈籠到晴空塔的未來感。",
+      moodColor: "bg-red-800",
+      events: [
+        {
+          time: "09:30",
+          activity: "藏前散策",
+          desc: "東京的布魯克林。探訪職人手作店鋪，喝杯文青咖啡開啟一天。",
+          icon: <Coffee size={18} className="text-brown-600" />,
+          tags: ["文青", "咖啡", "雜貨"],
+          imageUrl: "https://live.staticflickr.com/65535/52688373703_1a42653962_c.jpg" // Placeholder for a Kuramae cafe vibe
+        },
+        {
+          time: "11:00",
+          activity: "淺草寺",
+          desc: "雷門大燈籠打卡，仲見世通吃人形燒、炸肉餅。參拜祈求旅途平安。",
+          icon: <Camera size={18} className="text-red-600" />,
+          tags: ["雷門", "淺草寺"],
+          imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Kaminarimon_in_Asakusa%2C_Tokyo_Japan.jpg/800px-Kaminarimon_in_Asakusa%2C_Tokyo_Japan.jpg"
+        },
+        {
+          time: "14:00",
+          activity: "秋葉原",
+          desc: "體驗電器街的獨特氛圍，扭蛋、模型、動漫聖地巡禮。",
+          icon: <Sparkles size={18} className="text-yellow-500" />,
+          tags: ["動漫", "電器街"],
+          imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Akihabara_Electric_Town_at_night.jpg/800px-Akihabara_Electric_Town_at_night.jpg"
+        },
+        {
+          time: "18:30",
+          activity: "東京晴空塔",
+          desc: "在 Solamachi 享用晚餐，欣賞冬季限定點燈與絕美夜景。",
+          icon: <Moon size={18} className="text-blue-600" />,
+          tags: ["夜景", "Skytree"],
+          imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Tokyo_Skytree_at_night_from_Sumida_River.jpg/800px-Tokyo_Skytree_at_night_from_Sumida_River.jpg"
+        }
+      ]
+    },
+    {
+      day: 3,
+      date: "12/21 (日)",
+      title: "懷舊風情一日遊",
+      mood: "放慢腳步，走進昭和時代的時光隧道，與貓咪不期而遇。",
+      moodColor: "bg-emerald-800",
+      events: [
+        {
+          time: "09:00",
+          activity: "龜有 & 柴又",
+          desc: "尋找兩津勘吉銅像，漫步柴又老街，感受濃濃的昭和下町味。",
+          icon: <MapPin size={18} className="text-emerald-600" />,
+          tags: ["烏龍派出所", "老街"],
+          imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Shibamata_Taishakuten_Sando.jpg/800px-Shibamata_Taishakuten_Sando.jpg"
+        },
+        {
+          time: "13:30",
+          activity: "上野恩賜公園 & 東照宮",
+          desc: "在寬廣的公園散步，參拜金碧輝煌的東照宮。",
+          icon: <TreeIcon className="text-green-600" />,
+          tags: ["公園", "神社"],
+          imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Ueno_Park_Tokyo_Japan.jpg/800px-Ueno_Park_Tokyo_Japan.jpg"
+        },
+        {
+          time: "16:30",
+          activity: "谷中銀座 & 根津神社",
+          desc: "著名的「夕陽階梯」與貓町散步，根津神社的千本鳥居。",
+          icon: <Camera size={18} className="text-orange-600" />,
+          tags: ["貓町", "夕陽"],
+          imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Yanaka_Ginza_Shopping_Street.jpg/800px-Yanaka_Ginza_Shopping_Street.jpg"
+        },
+        {
+          time: "18:30",
+          activity: "東京車站丸之內聖誕燈",
+          desc: "漫步在香檳金色的燈海大道，享用精緻晚餐。",
+          icon: <Star size={18} className="text-yellow-500" />,
+          tags: ["聖誕燈飾", "丸之內"],
+          imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/Marunouchi_Illumination_2017.jpg/800px-Marunouchi_Illumination_2017.jpg"
+        }
+      ]
+    },
+    {
+      day: 4,
+      date: "12/22 (一)",
+      title: "鎌倉與都會夜景",
+      mood: "聽見海的聲音，感受古都的靜謐，最後回歸城市的繁華。",
+      moodColor: "bg-blue-800",
+      events: [
+        {
+          time: "09:00",
+          activity: "鎌倉散策",
+          desc: "鶴岡八幡宮參拜，小町通吃吻仔魚丼、逛特色小店。",
+          icon: <MapPin size={18} className="text-red-500" />,
+          tags: ["鶴岡八幡宮", "小町通"],
+          imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Tsurugaoka_Hachiman-g%C5%AB.jpg/800px-Tsurugaoka_Hachiman-g%C5%AB.jpg"
+        },
+        {
+          time: "13:00",
+          activity: "江之電之旅",
+          desc: "搭乘復古電車。長谷寺看大佛，鎌倉高校前拍灌籃高手平交道。",
+          icon: <Train size={18} className="text-green-600" />,
+          tags: ["江之電", "灌籃高手"],
+          imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Enoden_Kamakurakokomae_Station.jpg/800px-Enoden_Kamakurakokomae_Station.jpg"
+        },
+        {
+          time: "18:30",
+          activity: "六本木",
+          desc: "體驗東京最奢華的聖誕燈飾，欣賞都會璀璨夜景。",
+          icon: <Moon size={18} className="text-purple-600" />,
+          tags: ["六本木之丘", "夜景"],
+          imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Roppongi_Hills_Mori_Tower_at_night.jpg/800px-Roppongi_Hills_Mori_Tower_at_night.jpg"
+        }
+      ]
+    },
+    {
+      day: 5,
+      date: "12/23 (二)",
+      title: "夢幻迪士尼",
+      mood: "在夢想與魔法的國度，找回童心，度過最浪漫的一天。",
+      moodColor: "bg-sky-700",
+      events: [
+        {
+          time: "08:00",
+          activity: "抵達東京迪士尼海洋",
+          desc: "建議開園前抵達排隊。準備好 App 抽取 DPA 或 Standby Pass。",
+          icon: <Star size={18} className="text-yellow-400" />,
+          tags: ["DisneySea", "排隊"],
+          imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Tokyo_DisneySea_Aquasphere.jpg/800px-Tokyo_DisneySea_Aquasphere.jpg"
+        },
+        {
+          time: "All Day",
+          activity: "沉浸海洋冒險",
+          desc: "地中海港灣、夢幻泉鄉、驚魂古塔。盡情享受設施與遊行表演。",
+          icon: <Heart size={18} className="text-pink-500" />,
+          tags: ["遊樂設施", "達菲熊"],
+          imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Mount_Prometheus_at_Tokyo_DisneySea.jpg/800px-Mount_Prometheus_at_Tokyo_DisneySea.jpg"
+        },
+        {
+          time: "20:30",
+          activity: "夜間煙火秀",
+          desc: "在 Believe! Sea of Dreams 的震撼演出中結束完美的一天。",
+          icon: <Sparkles size={18} className="text-yellow-300" />,
+          tags: ["煙火", "感動"],
+          imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Tokyo_Disney_Sea_Night_Show.jpg/800px-Tokyo_Disney_Sea_Night_Show.jpg"
+        }
+      ]
+    },
+    {
+      day: 6,
+      date: "12/24 (三)",
+      title: "最後的漫步與返程",
+      mood: "收拾行囊，將東京的記憶摺疊收好，期待下次再見。",
+      moodColor: "bg-gray-700",
+      events: [
+        {
+          time: "Morning",
+          activity: "小傳馬町散策",
+          desc: "Dormy Inn 附近悠閒走走，享用最後的日本早餐，或最後採買。",
+          icon: <Coffee size={18} className="text-brown-500" />,
+          tags: ["散步", "早餐"]
+        },
+        {
+          time: "12:15",
+          activity: "前往機場",
+          desc: "務必準時離開飯店！搭乘電車前往成田機場。",
+          icon: <Train size={18} className="text-blue-500" />,
+          tags: ["移動", "不遲到"],
+          imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/E259_series_Narita_Express.jpg/800px-E259_series_Narita_Express.jpg"
+        },
+        {
+          time: "13:20",
+          activity: "抵達成田機場",
+          desc: "辦理登機手續，逛免稅店買伴手禮 (Banana, Royce)。",
+          icon: <Plane size={18} className="text-indigo-600" />,
+          tags: ["免稅店", "登機"],
+          imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Narita_Airport_Terminal_2_Departure_Hall.jpg/800px-Narita_Airport_Terminal_2_Departure_Hall.jpg"
+        },
+        {
+          time: "15:20",
+          activity: "起飛返家",
+          desc: "帶著滿滿的回憶與戰利品，平安回家。",
+          icon: <Plane size={18} className="text-indigo-800" />,
+          tags: ["平安", "回憶"]
+        }
+      ]
+    }
+  ];
+
+  return (
+    <div className="min-h-screen bg-[#f7f5f0] text-stone-800 font-sans selection:bg-orange-200">
+      {/* Hero Section */}
+      <div className="relative h-96 w-full overflow-hidden">
+        <div className="absolute inset-0 bg-stone-900/30 z-10"></div>
+        <img 
+          src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Skyscrapers_of_Shinjuku_2009_January.jpg/1200px-Skyscrapers_of_Shinjuku_2009_January.jpg" 
+          alt="Tokyo Cover" 
+          className="w-full h-full object-cover grayscale-[30%]"
+        />
+        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-white text-center px-4">
+          <div className="bg-white/10 backdrop-blur-md p-8 rounded-full border border-white/30 shadow-2xl">
+            <h1 className="text-4xl md:text-6xl font-bold tracking-widest mb-4 font-serif text-shadow-lg">東京冬旅</h1>
+            <p className="text-lg md:text-xl font-light tracking-widest uppercase text-shadow-sm">Dec 19 - Dec 24</p>
+            <div className="mt-6 w-16 h-1 bg-white mx-auto rounded-full"></div>
+          </div>
+          {daysLeft > 0 && (
+            <div className="mt-8 bg-orange-600/90 text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg animate-bounce">
+              距離出發還有 {daysLeft} 天
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-3xl mx-auto px-4 py-12 -mt-20 relative z-30">
+        
+        {/* Intro Card */}
+        <div className="bg-white p-8 rounded-2xl shadow-xl mb-12 text-center border-t-4 border-orange-400">
+          <p className="text-stone-600 italic leading-loose text-lg font-serif">
+            「在聖誕燈飾點亮的東京街頭，<br/>
+            我們尋找昭和的溫度，也擁抱城市的繁華。<br/>
+            這是一趟關於光、海風與夢想的旅程。」
+          </p>
+        </div>
+
+        {/* Schedule Cards */}
+        <div>
+          {scheduleData.map((day) => (
+            <ScheduleCard key={day.day} {...day} />
+          ))}
+        </div>
+
+        {/* Footer */}
+        <div className="text-center text-stone-400 py-12 border-t border-stone-300 mt-12">
+          <div className="flex justify-center gap-4 mb-4">
+            <Plane size={20} />
+            <Heart size={20} />
+            <Camera size={20} />
+          </div>
+          <p className="text-sm">Created for your lovely trip to Tokyo.</p>
+          <p className="text-xs mt-2">記得攜帶保暖衣物與好心情 :)</p>
+        </div>
+      </div>
+      
+      <button 
+        onClick={() => window.print()}
+        className="fixed bottom-8 right-8 bg-stone-800 text-white p-4 rounded-full shadow-2xl hover:bg-stone-700 transition-colors z-50 print:hidden"
+        title="列印行程"
+      >
+        <Utensils size={24} />
+      </button>
+
+      <style>{`
+        @media print {
+          .print\\:hidden { display: none; }
+          .max-h-0 { max-height: none !important; opacity: 1 !important; }
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=Zen+Maru+Gothic:wght@400;700&display=swap');
+        body { font-family: 'Zen Maru Gothic', 'Noto Serif TC', sans-serif; }
+        .text-shadow-lg { text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        .text-shadow-sm { text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+      `}</style>
+    </div>
+  );
+};
+
+const TreeIcon = ({ className }) => (
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    width="18" 
+    height="18" 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round" 
+    className={className}
+  >
+    <path d="M12 19v-9"/>
+    <path d="M7 19h10"/>
+    <path d="M11 19v-9"/>
+    <path d="M13 19v-9"/>
+    <circle cx="12" cy="5" r="3"/>
+    <path d="M12 8l-3 5h6l-3-5z"/>
+  </svg>
+);
+
+export default ItineraryApp;
+
